@@ -1,5 +1,8 @@
 package com.Product.Inventory.product_inventory.service;
 
+import com.Product.Inventory.product_inventory.exception.CategoryNotFoundException;
+import com.Product.Inventory.product_inventory.exception.PriceRangeException;
+import com.Product.Inventory.product_inventory.exception.StockNotFoundException;
 import com.Product.Inventory.product_inventory.model.Product;
 import com.Product.Inventory.product_inventory.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -34,20 +38,29 @@ public class ProductService {
     }
 
     public List<Product> filterProductsByCategory(String category) {
-        return productRepository.findByCategory(category);
+        List<Product> products = productRepository.findByCategory(category);
+        if (products.isEmpty()) {
+            throw new CategoryNotFoundException("No products found for category: " + category);
+        }
+        return products;
     }
 
-    public List<Product> filterProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-        return productRepository.findByPriceBetween(minPrice, maxPrice);
+    public List<Product> filterProductsByPriceRange(Integer minPrice, Integer maxPrice) {
+        List<Product> products = productRepository.findByPriceBetween(minPrice, maxPrice);
+        if (products.isEmpty()) {
+            throw new PriceRangeException("No products found in the price range: " + minPrice + " - " + maxPrice);
+        }
+        return products;
     }
 
     public List<Product> filterProductsByStock(int stock) {
-        return productRepository.findByStockGreaterThan(stock);
+        List<Product> products = productRepository.findByStockGreaterThan(stock);
+        if (products.isEmpty()) {
+            throw new StockNotFoundException("No products available with stock greater than: " + stock);
+        }
+        return products;
     }
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
-    }
 
     public Product addProduct(String name, String category , int price , int stock,MultipartFile photo) throws Exception {
         Product product=new Product();

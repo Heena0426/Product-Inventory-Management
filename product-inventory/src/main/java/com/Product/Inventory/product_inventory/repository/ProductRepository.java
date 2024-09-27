@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory(String category);
-    List<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
+    List<Product> findByPriceBetween(Integer minPrice, Integer maxPrice);
     List<Product> findByStockGreaterThan(int Stock);
 }
